@@ -13,7 +13,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
+import android.widget.EditText;
+import android.util.Log;
+import com.example.genie.conversation.ConversationalAgent;
+import com.example.genie.utils.GPTApiClient;
+import com.example.genie.utils.SessionContext;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
                     }
             );
 
+    /*
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,6 +54,49 @@ public class MainActivity extends AppCompatActivity {
 
         // 4) Set up the Speak button to initiate voice input
         speakButton.setOnClickListener(v -> startVoiceInput());
+    }*/
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        transcriptionTextView = findViewById(R.id.transcriptionTextView);
+        Button speakButton = findViewById(R.id.speakButton);
+
+        // Existing speech input
+        speakButton.setOnClickListener(v -> startVoiceInput());
+
+        // Dev Test Button
+        EditText devInputEditText = findViewById(R.id.devInputEditText);
+        Button devTestButton = findViewById(R.id.devTestButton);
+        devTestButton.setOnClickListener(v -> {
+            String simulatedText = devInputEditText.getText().toString();
+            if (!simulatedText.isEmpty()) {
+                transcriptionTextView.setText(simulatedText);
+
+                GPTApiClient client = new GPTApiClient();
+                client.callGPT4API(simulatedText, new GPTApiClient.GPTCallback() {
+                    @Override
+                    public void onSuccess(String response) {
+                        Log.d("GPT Response", response);
+                        runOnUiThread(() -> transcriptionTextView.setText(response));
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        Log.e("GPT Error", error);
+                        Toast.makeText(MainActivity.this, "GPT Error: " + error, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+    }
+
+    public void debugSetTranscribedText(String mockText) {
+        transcriptionTextView.setText(mockText);
+        // Then pass mockText to the next step, e.g.,
+        // conversationalAgent.processUserCommand(mockText, ...);
     }
 
     // 5) Initiates the speech recognition intent using the new Activity Result API

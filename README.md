@@ -4,33 +4,35 @@ Genie is an Android automation app that converts voice commands into automated a
 
 ## Project Structure
 ```
-Genie/ <br>
-├── app/<br>
-├── src/<br>
-│   └── main/<br>
-│       └── java/<br>
-│           └── com/<br>
-│               └── example/<br>
-│                   └── genie/<br>
-│                       ├── MainActivity.kt<br>
-│                       ├── conversation/<br>
-│                       │   └── ConversationalAgent.kt<br>
-│                       ├── microapp/<br>
-│                       │   └── MicroAppGenerator.kt<br>
-│                       ├── trigger/<br>
-│                       │   └── ContextAwareTrigger.kt<br>
-│                       ├── service/<br>
-│                       │   └── GenieAccessibilityService.kt<br>
-│                       └── utils/<br>
-│                           ├── SpeechRecognitionUtil.kt<br>
-│                           └── UIAutomationUtil.kt<br>
-├── res/<br>
-│   ├── layout/<br>
-│   ├── values/<br>
-│   └── xml/<br>
-├── AndroidManifest.xml<br>
-├── build.gradle<br>
-└── settings.gradle<br>
+Genie/
+├── app/
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/com/yourcompany/genie/
+│   │   │   │   ├── MainActivity.kt
+│   │   │   │   ├── conversation/
+│   │   │   │   │   └── ConversationalAgent.kt
+│   │   │   │   ├── microapp/
+│   │   │   │   │   └── MicroAppGenerator.kt
+│   │   │   │   ├── trigger/
+│   │   │   │   │   └── ContextAwareTrigger.kt
+│   │   │   │   ├── service/
+│   │   │   │   │   └── GenieAccessibilityService.kt
+│   │   │   │   └── utils/
+│   │   │   │       ├── SpeechRecognitionUtil.kt
+│   │   │   │       └── UIAutomationUtil.kt
+│   │   │   ├── res/
+│   │   │   │   ├── layout/
+│   │   │   │   │   └── activity_main.xml
+│   │   │   │   ├── values/
+│   │   │   │   │   ├── strings.xml
+│   │   │   │   │   └── styles.xml
+│   │   │   │   └── xml/
+│   │   │   │       └── accessibility_service_config.xml
+│   │   │   └── AndroidManifest.xml
+│   └── build.gradle
+├── build.gradle
+└── settings.gradle
 ```
 ## Modules
 
