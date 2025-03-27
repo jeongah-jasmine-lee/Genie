@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The app's name -->
+    <string name="app_name">Genie</string>
+
+    <!-- Speak button text -->
+    <string name="button_speak">Speak</string>
+
+    <!-- Default transcribed text placeholder -->
+    <string name="transcribed_text">Transcribed text will appear here</string>
+</resources>
