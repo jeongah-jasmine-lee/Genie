@@ -5,18 +5,18 @@ Genie is an Android automation app that converts voice commands into automated a
 ## Project Structure
 
 Genie/ 
-├── app/ │ 
-├── src/main/java/com/yourcompany/genie/ 
-│ │ ├── MainActivity.kt 
-│ │ ├── conversation/ConversationalAgent.kt 
-│ │ ├── microapp/MicroAppGenerator.kt 
-│ │ ├── trigger/ContextAwareTrigger.kt 
-│ │ ├── service/GenieAccessibilityService.kt 
-│ │ └── utils/{SpeechRecognitionUtil.kt, UIAutomationUtil.kt} 
-│ ├── res/{layout, values, xml} 
-│ └── AndroidManifest.xml 
-├── build.gradle 
-└── settings.gradle
+├── app/ │ <br>
+├── src/main/java/com/yourcompany/genie/ <br>
+│ │ ├── MainActivity.kt <br>
+│ │ ├── conversation/ConversationalAgent.kt <br>
+│ │ ├── microapp/MicroAppGenerator.kt <br>
+│ │ ├── trigger/ContextAwareTrigger.kt <br>
+│ │ ├── service/GenieAccessibilityService.kt <br>
+│ │ └── utils/{SpeechRecognitionUtil.kt, UIAutomationUtil.kt} <br>
+│ ├── res/{layout, values, xml} <br>
+│ └── AndroidManifest.xml <br>
+├── build.gradle <br>
+└── settings.gradle<br>
 
 
 ## Modules
