@@ -4,7 +4,7 @@ Genie is an Android automation app that converts voice commands into automated a
 
 ## Project Structure
 
-Genie/ 
+Genie/ <br>
 ├── app/ │ <br>
 ├── src/main/java/com/yourcompany/genie/ <br>
 │ │ ├── MainActivity.kt <br>
