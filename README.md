@@ -5,19 +5,32 @@ Genie is an Android automation app that converts voice commands into automated a
 ## Project Structure
 
 Genie/ <br>
-├── app/ │ <br>
-├── src/main/java/com/yourcompany/genie/ <br>
-│ │ ├── MainActivity.kt <br>
-│ │ ├── conversation/ConversationalAgent.kt <br>
-│ │ ├── microapp/MicroAppGenerator.kt <br>
-│ │ ├── trigger/ContextAwareTrigger.kt <br>
-│ │ ├── service/GenieAccessibilityService.kt <br>
-│ │ └── utils/{SpeechRecognitionUtil.kt, UIAutomationUtil.kt} <br>
-│ ├── res/{layout, values, xml} <br>
-│ └── AndroidManifest.xml <br>
-├── build.gradle <br>
+├── app/<br>
+├── src/<br>
+│   └── main/<br>
+│       └── java/<br>
+│           └── com/<br>
+│               └── example/<br>
+│                   └── genie/<br>
+│                       ├── MainActivity.kt<br>
+│                       ├── conversation/<br>
+│                       │   └── ConversationalAgent.kt<br>
+│                       ├── microapp/<br>
+│                       │   └── MicroAppGenerator.kt<br>
+│                       ├── trigger/<br>
+│                       │   └── ContextAwareTrigger.kt<br>
+│                       ├── service/<br>
+│                       │   └── GenieAccessibilityService.kt<br>
+│                       └── utils/<br>
+│                           ├── SpeechRecognitionUtil.kt<br>
+│                           └── UIAutomationUtil.kt<br>
+├── res/<br>
+│   ├── layout/<br>
+│   ├── values/<br>
+│   └── xml/<br>
+├── AndroidManifest.xml<br>
+├── build.gradle<br>
 └── settings.gradle<br>
-
 
 ## Modules
 
