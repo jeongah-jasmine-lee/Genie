@@ -9,9 +9,14 @@ Genie/
 │   ├── src/
 │   │   ├── main/
 │   │   │   ├── java/com/yourcompany/genie/
-│   │   │   │   ├── MainActivity.kt
+│   │   │   │   ├── MainActivity.java # input user voice
 │   │   │   │   ├── conversation/
-│   │   │   │   │   └── ConversationalAgent.kt
+│   │   │   │   │   └── ConversationalAgent.java
+│   │   │   │   ├── model/
+│   │   │   │   │   └── ChatRequestBody.java
+│   │   │   │   │   └── ChatResponseObject.java
+│   │   │   │   ├── network/
+│   │   │   │   │   └── JsonApi.java
 │   │   │   │   ├── microapp/
 │   │   │   │   │   └── MicroAppGenerator.kt
 │   │   │   │   ├── trigger/
@@ -19,6 +24,8 @@ Genie/
 │   │   │   │   ├── service/
 │   │   │   │   │   └── GenieAccessibilityService.kt
 │   │   │   │   └── utils/
+│   │   │   │       ├── GPTApiClient.kt # call gpt api
+│   │   │   │       ├── SessionContext.kt
 │   │   │   │       ├── SpeechRecognitionUtil.kt
 │   │   │   │       └── UIAutomationUtil.kt
 │   │   │   ├── res/
