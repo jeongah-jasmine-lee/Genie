@@ -19,7 +19,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class GPTApiClient {
     private static final String TAG = "GPTApiClient";
-    private static final String API_KEY = " ";
+    private static final String API_KEY = "";
     private static final String BASE_URL = "https://api.openai.com/";
 
     private final JsonApi jsonApi;

@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
             );
-
+    // ⭐ enable text input just for demo
     /*
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
         // Dev Test Button
         EditText devInputEditText = findViewById(R.id.devInputEditText);
         Button devTestButton = findViewById(R.id.devTestButton);
+        // ⭐ Do not run GPT for demo
+        /*
         devTestButton.setOnClickListener(v -> {
             String simulatedText = devInputEditText.getText().toString();
             if (!simulatedText.isEmpty()) {
@@ -89,7 +91,21 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "GPT Error: " + error, Toast.LENGTH_SHORT).show();
                     }
                 });
-            }
+            });
+        }*/
+        devTestButton.setOnClickListener(v -> {
+            transcriptionTextView.setText("Running demo...");
+
+            SessionContext mockContext = SessionContext.getInstance();
+            mockContext.setUserCommand("Increase font size");
+            mockContext.setAppName("Settings");
+            mockContext.setPackageName("com.android.settings");
+            mockContext.setActivityName("SettingsActivity");
+            // Optionally mock other fields like allowedActions, uiSnapshot, etc.
+
+            // Run the static demo flow (no GPT)
+            ConversationalAgent agent = new ConversationalAgent(new GPTApiClient());
+            agent.runDemo(mockContext, this);
         });
     }
 

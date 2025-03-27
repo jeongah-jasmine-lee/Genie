@@ -4,11 +4,18 @@ import android.util.Log;
 import com.example.genie.utils.GPTApiClient;
 import com.example.genie.utils.SessionContext;
 import java.util.StringJoiner;
+import android.view.accessibility.AccessibilityNodeInfo;
+import com.example.genie.executor.GPTActionExecutor;
+import android.content.Context;
+import android.content.Intent;
+import android.provider.Settings;
+import android.util.Log;
 
 public class ConversationalAgent {
 
     private static final String TAG = "ConversationalAgent";
     private final GPTApiClient gptApiClient;
+    private final GPTActionExecutor executor = new GPTActionExecutor();
 
     public ConversationalAgent(GPTApiClient apiClient) {
         this.gptApiClient = apiClient;
@@ -19,6 +26,15 @@ public class ConversationalAgent {
         void onError(String error);
     }
 
+    private GPTActionExecutor.ActionType parseActionTypeEnum(String actionTypeStr) {
+        try {
+            return GPTActionExecutor.ActionType.valueOf(actionTypeStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            Log.w(TAG, "Invalid action type string: " + actionTypeStr);
+            return GPTActionExecutor.ActionType.UNKNOWN;
+        }
+    }
+
     public void processUserCommand(SessionContext context, AgentCallback callback) {
         String step1Prompt = buildStep1Prompt(context);
         Log.d(TAG, "Step 1 Prompt:\n" + step1Prompt);
@@ -26,16 +42,22 @@ public class ConversationalAgent {
         gptApiClient.callGPT4API(step1Prompt, new GPTApiClient.GPTCallback() {
             @Override
             public void onSuccess(String step1Response) {
-                String actionType = parseActionType(step1Response);
+                String actionTypeStr = parseActionType(step1Response);
+                GPTActionExecutor.ActionType parsedActionType = parseActionTypeEnum(actionTypeStr);
 
-                String step2Prompt = buildStep2Prompt(context, actionType);
+                String step2Prompt = buildStep2Prompt(context, parsedActionType.name());
                 Log.d(TAG, "Step 2 Prompt:\n" + step2Prompt);
 
                 gptApiClient.callGPT4API(step2Prompt, new GPTApiClient.GPTCallback() {
                     @Override
                     public void onSuccess(String step2Response) {
                         String targetElement = parseTargetElement(step2Response);
-                        callback.onDecision(new ActionDecision(actionType, targetElement));
+                        AccessibilityNodeInfo rootNode = context.getRootNode(); // You’ll need to add this getter
+                        GPTActionExecutor executor = new GPTActionExecutor();
+                        executor.executeAction(parsedActionType, targetElement, rootNode);
+                        Log.d(TAG, "parsedActionType:\n" + parsedActionType);
+                        callback.onDecision(new ActionDecision(parsedActionType.name(), targetElement));
+
                     }
 
                     @Override
@@ -109,6 +131,76 @@ public class ConversationalAgent {
         public ActionDecision(String actionType, String targetElement) {
             this.actionType = actionType;
             this.targetElement = targetElement;
+        }
+    }
+
+    // 🔧 Static run-through demo — no GPT required
+    private void logAllClickableNodes(AccessibilityNodeInfo node) {
+        if (node == null) {
+            return;
+        }
+
+        // If the node is clickable, log its details
+        if (node.isClickable()) {
+            String text = node.getText() != null ? node.getText().toString() : "null";
+            String contentDesc = node.getContentDescription() != null ? node.getContentDescription().toString() : "null";
+            String viewId = node.getViewIdResourceName() != null ? node.getViewIdResourceName() : "null";
+            Log.d(TAG, "Clickable Node: text=" + text
+                    + ", contentDesc=" + contentDesc
+                    + ", viewId=" + viewId);
+        }
+
+        // Recursively process each child node
+        for (int i = 0; i < node.getChildCount(); i++) {
+            AccessibilityNodeInfo child = node.getChild(i);
+            logAllClickableNodes(child);
+            // Note: Do not recycle the node here if it's managed by the framework.
+        }
+    }
+
+    public void runDemo(SessionContext context, Context activityContext) {
+        // Step 1: Open device Settings
+        sleep();
+
+        Log.d(TAG, "Demo Step 1: Open Device Settings");
+        Intent settingsIntent = new Intent(Settings.ACTION_SETTINGS);
+        settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        activityContext.startActivity(settingsIntent);
+        sleep();
+
+        // ⭐ [TODO] Step 2: Get the accessibility root node (ensure your AccessibilityService is updating this)
+        AccessibilityNodeInfo rootNode = context.getRootNode();
+        if (rootNode == null) {
+            Log.e(TAG, "Root node is null, cannot simulate further actions.");
+            // Optionally, notify the caller that the root node is not available.
+            return;
+        }
+        // Log all clickable UI targets for debugging
+        Log.d(TAG, "Logging all clickable nodes in the UI:");
+        logAllClickableNodes(rootNode);
+
+        // Step 3: Simulate tapping "Display"
+        Log.d(TAG, "Demo Step 2: Tap Display");
+        executor.executeAction(GPTActionExecutor.ActionType.TAP, "Display & touch", rootNode);
+        sleep();
+
+        // Step 4: Simulate tapping "Font size"
+        Log.d(TAG, "Demo Step 3: Tap Font size");
+        executor.executeAction(GPTActionExecutor.ActionType.TAP, "Font size", rootNode);
+        sleep();
+
+        // Step 5: Simulate tapping the "+" on the slider
+        Log.d(TAG, "Demo Step 4: Tap '+' to increase font size");
+        executor.executeAction(GPTActionExecutor.ActionType.TAP, "+", rootNode);
+        sleep();
+    }
+
+
+    private void sleep() {
+        try {
+            Thread.sleep(1000); // 1 second pause between steps
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
     }
 }
