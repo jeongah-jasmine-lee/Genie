@@ -3,7 +3,7 @@
 Genie is an Android automation app that converts voice commands into automated actions using GPT-4 and Android’s Accessibility Services.
 
 ## Project Structure
-
+```
 Genie/ <br>
 ├── app/<br>
 ├── src/<br>
@@ -31,7 +31,7 @@ Genie/ <br>
 ├── AndroidManifest.xml<br>
 ├── build.gradle<br>
 └── settings.gradle<br>
-
+```
 ## Modules
 
 - **Conversational Agent:** Captures voice commands, gathers context, and uses a two-step GPT-4 process to decide on an action and target UI element.
