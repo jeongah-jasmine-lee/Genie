@@ -31,11 +31,11 @@
             </intent-filter>
         </activity>
 
-        <!-- ✅ Accessibility Service MUST be declared inside <application> -->
+        <!-- Accessibility Service -->
         <service
             android:name=".GenieAccessibilityService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
             </intent-filter>

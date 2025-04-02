@@ -145,7 +145,7 @@ public class ConversationalAgent {
             String text = node.getText() != null ? node.getText().toString() : "null";
             String contentDesc = node.getContentDescription() != null ? node.getContentDescription().toString() : "null";
             String viewId = node.getViewIdResourceName() != null ? node.getViewIdResourceName() : "null";
-            Log.d(TAG, "Clickable Node: text=" + text
+            Log.d(TAG, "⭐Clickable Node: text=" + text
                     + ", contentDesc=" + contentDesc
                     + ", viewId=" + viewId);
         }
@@ -155,6 +155,24 @@ public class ConversationalAgent {
             AccessibilityNodeInfo child = node.getChild(i);
             logAllClickableNodes(child);
             // Note: Do not recycle the node here if it's managed by the framework.
+        }
+    }
+
+    private void logNodeTree(AccessibilityNodeInfo node, String indent) {
+        if (node == null) return;
+
+        // Log details of the current node
+        String details = String.format("⭐Class: %s, Text: %s, ContentDesc: %s, ViewId: %s",
+                node.getClassName(),
+                node.getText(),
+                node.getContentDescription(),
+                node.getViewIdResourceName());
+        Log.d(TAG, indent + details);
+
+        // Recursively log all children nodes
+        for (int i = 0; i < node.getChildCount(); i++) {
+            AccessibilityNodeInfo child = node.getChild(i);
+            logNodeTree(child, indent + "  ");
         }
     }
 
@@ -178,6 +196,7 @@ public class ConversationalAgent {
         // Log all clickable UI targets for debugging
         Log.d(TAG, "Logging all clickable nodes in the UI:");
         logAllClickableNodes(rootNode);
+        logNodeTree(rootNode, "");
 
         // Step 3: Simulate tapping "Display"
         Log.d(TAG, "Demo Step 2: Tap Display");
