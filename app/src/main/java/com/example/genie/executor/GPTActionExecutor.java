@@ -18,6 +18,7 @@ public class GPTActionExecutor {
         UNKNOWN
     }
 
+    /*
     public void executeAction(ActionType actionType, String target, AccessibilityNodeInfo rootNode) {
         if (rootNode == null) {
             Log.e(TAG, "Root node is null, cannot perform action.");
@@ -46,6 +47,75 @@ public class GPTActionExecutor {
             default:
                 Log.w(TAG, "Unknown action type. Skipping.");
         }
+    }
+     */
+
+    public void executeAction(ActionType actionType, String target, AccessibilityNodeInfo rootNode) {
+        Log.d(TAG, "===========ExecuteAction=========");
+        if (rootNode == null) {
+            Log.e(TAG, "Root node is null, cannot perform action.");
+            return;
+        }
+
+        switch (actionType) {
+            case TAP:
+                // Find the node by matching text
+                AccessibilityNodeInfo targetNode = findNodeByText(rootNode, target);
+                if (targetNode != null) {
+                    String targetInfo = "Text: " + (targetNode.getText() != null ? targetNode.getText().toString() : "null")
+                            + ", ContentDesc: " + (targetNode.getContentDescription() != null ? targetNode.getContentDescription().toString() : "null")
+                            + ", ViewId: " + (targetNode.getViewIdResourceName() != null ? targetNode.getViewIdResourceName() : "null");
+                    Log.d(TAG, "TAP action: Found target node: " + targetInfo);
+                    // Attempt to click the node
+                    boolean result = targetNode.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                    if (result) {
+                        Log.d(TAG, "TAP action performed successfully.");
+                    } else {
+                        Log.e(TAG, "TAP action failed to perform on target node.");
+                    }
+                } else {
+                    Log.e(TAG, "TAP action: Target node with text '" + target + "' not found.");
+                }
+                break;
+
+            case ENTER_TEXT:
+                enterText(rootNode, target);
+                break;
+
+            case SCROLL:
+                Log.d(TAG, "Scroll action requested: " + target);
+                break;
+
+            case OPEN_APP:
+                Log.d(TAG, "Open app action requested: " + target);
+                break;
+
+            default:
+                Log.w(TAG, "Unknown action type. Skipping.");
+        }
+    }
+
+    /**
+     * Recursively searches the accessibility node tree for a node whose text equals (ignoring case)
+     * the specified target text.
+     */
+    private AccessibilityNodeInfo findNodeByText(AccessibilityNodeInfo node, String targetText) {
+        if (node == null) {
+            return null;
+        }
+
+        if (node.getText() != null && node.getText().toString().equalsIgnoreCase(targetText)) {
+            return node;
+        }
+
+        for (int i = 0; i < node.getChildCount(); i++) {
+            AccessibilityNodeInfo child = node.getChild(i);
+            AccessibilityNodeInfo result = findNodeByText(child, targetText);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
     }
 
     private static void clickNodeByText(AccessibilityNodeInfo rootNode, String text) {

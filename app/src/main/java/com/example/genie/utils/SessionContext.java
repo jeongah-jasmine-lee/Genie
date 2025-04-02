@@ -10,18 +10,18 @@ public class SessionContext {
     private static SessionContext instance;
 
     private String userCommand;
-    private String uiSnapshot;
+    private String uiSnapshot; // Holds the rich UI snapshot as a string (e.g., XML or text tree)
     private String executionHistory;
     private String appName;
     private String packageName;
     private String activityName;
     private String screenResolution;
     private List<String> allowedActions;
-    private AccessibilityNodeInfo rootNode; // Holds the current active UI's root node
+    private AccessibilityNodeInfo rootNode; // Stores the raw accessibility node representing the current UI
 
     private static final String TAG = "SessionContext";
 
-    // Private constructor for singleton pattern
+    // Private constructor (singleton pattern)
     private SessionContext() {
         this.userCommand = "";
         this.uiSnapshot = "";
@@ -33,7 +33,9 @@ public class SessionContext {
         this.allowedActions = new ArrayList<>();
     }
 
-    // Singleton accessor (thread-safe)
+    /**
+     * Returns the singleton instance of SessionContext.
+     */
     public static synchronized SessionContext getInstance() {
         if (instance == null) {
             instance = new SessionContext();
@@ -42,7 +44,8 @@ public class SessionContext {
         return instance;
     }
 
-    // Setters and getters for userCommand, uiSnapshot, executionHistory, app info, etc.
+    // Setters and getters for all session fields.
+
     public void setUserCommand(String userCommand) { this.userCommand = userCommand; }
     public String getUserCommand() { return userCommand; }
 
@@ -67,12 +70,17 @@ public class SessionContext {
     public void setAllowedActions(List<String> allowedActions) { this.allowedActions = allowedActions; }
     public List<String> getAllowedActions() { return allowedActions; }
 
-    // Methods to update and retrieve the AccessibilityNodeInfo for the current UI
+    /**
+     * Updates the current raw accessibility root node.
+     */
     public synchronized void setRootNode(AccessibilityNodeInfo rootNode) {
         this.rootNode = rootNode;
         Log.d(TAG, "Root node updated in SessionContext");
     }
 
+    /**
+     * Retrieves the current raw accessibility root node.
+     */
     public synchronized AccessibilityNodeInfo getRootNode() {
         return this.rootNode;
     }
