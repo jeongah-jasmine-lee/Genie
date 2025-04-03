@@ -253,14 +253,30 @@ public class ConversationalAgent {
         return null;
     }
 
+    private AccessibilityNodeInfo findNodeByTextOrDescPartial(AccessibilityNodeInfo node, String keyword) {
+        if (node == null) return null;
+
+        String text = node.getText() != null ? node.getText().toString() : "";
+        String desc = node.getContentDescription() != null ? node.getContentDescription().toString() : "";
+
+        if (text.toLowerCase().contains(keyword.toLowerCase()) || desc.toLowerCase().contains(keyword.toLowerCase())) {
+            return node;
+        }
+
+        for (int i = 0; i < node.getChildCount(); i++) {
+            AccessibilityNodeInfo child = node.getChild(i);
+            AccessibilityNodeInfo result = findNodeByTextOrDescPartial(child, keyword);
+            if (result != null) return result;
+        }
+        return null;
+    }
+
     public void runDemo(SessionContext context, Context activityContext) {
-        // Step 1: Open device Settings
         Log.d(TAG, "Demo Step 1: Open Device Settings");
         Intent settingsIntent = new Intent(Settings.ACTION_SETTINGS);
         settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         activityContext.startActivity(settingsIntent);
 
-        // Wait for the Settings window to become active.
         waitForSettingsWindow(new OnWindowReadyListener() {
             @Override
             public void onWindowReady(AccessibilityNodeInfo rootNode) {
@@ -269,40 +285,77 @@ public class ConversationalAgent {
                     return;
                 }
 
-                // Log UI details
-                Log.d(TAG, "Settings UI is active. Logging UI nodes:");
+                Log.d(TAG, "⭐ Settings UI is active. Logging UI nodes:");
                 logAllClickableNodes(rootNode);
                 logNodeTree(rootNode, "");
                 logRootNodeDetails(rootNode);
 
-                // Try to tap using fallback logic
+                // Step 2: Tap "Display" or "Display & touch"
                 Log.d(TAG, "Demo Step 2: Tap Display");
-
-                AccessibilityNodeInfo displayNode = findNodeByTextPartial(rootNode, "Display");
+                AccessibilityNodeInfo displayNode = findNodeByTextOrDescPartial(rootNode, "Display");
                 if (displayNode != null) {
-                    AccessibilityNodeInfo targetToClick = findClickableParent(displayNode);
-                    if (targetToClick != null) {
-                        boolean clicked = targetToClick.performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                        if (clicked) {
-                            Log.d(TAG, "Successfully tapped on Display.");
-                        } else {
-                            Log.e(TAG, "Failed to click on Display node.");
-                        }
+                    AccessibilityNodeInfo clickable = findClickableParent(displayNode);
+                    if (clickable != null && clickable.performAction(AccessibilityNodeInfo.ACTION_CLICK)) {
+                        Log.d(TAG, "✅ Clicked on Display!");
                     } else {
-                        Log.e(TAG, "No clickable parent found for Display.");
+                        Log.e(TAG, "❌ Failed to click Display.");
+                        return;
                     }
-                } else {
-                    Log.e(TAG, "Could not find any node containing 'Display'.");
                 }
 
-                Log.d(TAG, "Demo Step 3: Tap Font size");
-                executor.executeAction(GPTActionExecutor.ActionType.TAP, "Font size", rootNode);
+                // Wait for the next screen to load
+                waitForSettingsWindow(new OnWindowReadyListener() {
+                    @Override
+                    public void onWindowReady(AccessibilityNodeInfo fontPageNode) {
+                        if (fontPageNode == null) {
+                            Log.e(TAG, "Failed to detect Display settings page.");
+                            return;
+                        }
 
-                Log.d(TAG, "Demo Step 4: Tap '+' to increase font size");
-                executor.executeAction(GPTActionExecutor.ActionType.TAP, "+", rootNode);
+                        Log.d(TAG, "⭐ Settings UI is active. Logging UI nodes:");
+                        logAllClickableNodes(rootNode);
+                        logNodeTree(rootNode, "");
+                        logRootNodeDetails(rootNode);
+                        Log.d(TAG, "Demo Step 3: Tap Font size");
+                        AccessibilityNodeInfo fontSizeNode = findNodeByTextOrDescPartial(fontPageNode, "Display size and text");
+                        if (fontSizeNode != null) {
+                            AccessibilityNodeInfo clickableFontSize = findClickableParent(fontSizeNode);
+                            if (clickableFontSize != null && clickableFontSize.performAction(AccessibilityNodeInfo.ACTION_CLICK)) {
+                                Log.d(TAG, "✅ Clicked on Font Size!");
+                            } else {
+                                Log.e(TAG, "❌ Could not click Font Size.");
+                            }
+                        } else {
+                            Log.e(TAG, "Font size not found.");
+                        }
+
+                        Log.d(TAG, "⭐ Settings UI is active. Logging UI nodes:");
+                        logAllClickableNodes(rootNode);
+                        logNodeTree(rootNode, "");
+                        logRootNodeDetails(rootNode);
+                        // Step 4: Tap "+" button to increase font size
+                        Log.d(TAG, "Demo Step 4: Tap '+' to increase font size");
+                        AccessibilityNodeInfo plusButton = findNodeByTextOrDescPartial(fontPageNode, "+");
+                        if (plusButton == null) {
+                            plusButton = findNodeByTextOrDescPartial(fontPageNode, "increase");
+                        }
+
+                        if (plusButton != null) {
+                            AccessibilityNodeInfo clickablePlus = findClickableParent(plusButton);
+                            if (clickablePlus != null && clickablePlus.performAction(AccessibilityNodeInfo.ACTION_CLICK)) {
+                                Log.d(TAG, "✅ Clicked + to increase font size");
+                            } else {
+                                Log.e(TAG, "❌ Failed to click +");
+                            }
+                        } else {
+                            Log.e(TAG, "Could not find '+' button");
+                        }
+                    }
+                });
             }
         });
     }
+
 
 
     /*private void sleep() {
