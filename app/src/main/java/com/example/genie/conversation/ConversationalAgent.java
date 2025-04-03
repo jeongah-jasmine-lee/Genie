@@ -228,6 +228,30 @@ public class ConversationalAgent {
      }
      */
 
+    private AccessibilityNodeInfo findNodeByTextPartial(AccessibilityNodeInfo node, String targetText) {
+        if (node == null) return null;
+
+        if (node.getText() != null &&
+                node.getText().toString().toLowerCase().contains(targetText.toLowerCase())) {
+            return node;
+        }
+
+        for (int i = 0; i < node.getChildCount(); i++) {
+            AccessibilityNodeInfo child = node.getChild(i);
+            AccessibilityNodeInfo result = findNodeByTextPartial(child, targetText);
+            if (result != null) return result;
+        }
+        return null;
+    }
+
+    private AccessibilityNodeInfo findClickableParent(AccessibilityNodeInfo node) {
+        AccessibilityNodeInfo parent = node;
+        while (parent != null) {
+            if (parent.isClickable()) return parent;
+            parent = parent.getParent();
+        }
+        return null;
+    }
 
     public void runDemo(SessionContext context, Context activityContext) {
         // Step 1: Open device Settings
@@ -236,7 +260,7 @@ public class ConversationalAgent {
         settingsIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         activityContext.startActivity(settingsIntent);
 
-        // Instead of fixed sleep, wait for the Settings window to become active.
+        // Wait for the Settings window to become active.
         waitForSettingsWindow(new OnWindowReadyListener() {
             @Override
             public void onWindowReady(AccessibilityNodeInfo rootNode) {
@@ -244,27 +268,42 @@ public class ConversationalAgent {
                     Log.e(TAG, "Failed to detect Settings UI");
                     return;
                 }
-                // Now that we know the Settings UI is active, log the UI info.
+
+                // Log UI details
                 Log.d(TAG, "Settings UI is active. Logging UI nodes:");
                 logAllClickableNodes(rootNode);
                 logNodeTree(rootNode, "");
                 logRootNodeDetails(rootNode);
 
-                // Step 3: Simulate tapping "Display"
+                // Try to tap using fallback logic
                 Log.d(TAG, "Demo Step 2: Tap Display");
-                executor.executeAction(GPTActionExecutor.ActionType.TAP, "Display", rootNode);
 
-                // Step 4: Simulate tapping "Font size"
+                AccessibilityNodeInfo displayNode = findNodeByTextPartial(rootNode, "Display");
+                if (displayNode != null) {
+                    AccessibilityNodeInfo targetToClick = findClickableParent(displayNode);
+                    if (targetToClick != null) {
+                        boolean clicked = targetToClick.performAction(AccessibilityNodeInfo.ACTION_CLICK);
+                        if (clicked) {
+                            Log.d(TAG, "Successfully tapped on Display.");
+                        } else {
+                            Log.e(TAG, "Failed to click on Display node.");
+                        }
+                    } else {
+                        Log.e(TAG, "No clickable parent found for Display.");
+                    }
+                } else {
+                    Log.e(TAG, "Could not find any node containing 'Display'.");
+                }
+
                 Log.d(TAG, "Demo Step 3: Tap Font size");
                 executor.executeAction(GPTActionExecutor.ActionType.TAP, "Font size", rootNode);
 
-
-                // Step 5: Simulate tapping the "+" on the slider
                 Log.d(TAG, "Demo Step 4: Tap '+' to increase font size");
                 executor.executeAction(GPTActionExecutor.ActionType.TAP, "+", rootNode);
             }
         });
     }
+
 
     /*private void sleep() {
         try {
